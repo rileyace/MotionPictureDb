@@ -10,7 +10,7 @@ def list_tables():
 
     # >>>> TODO 1: Write a query to list all the tables in the database. <<<<
 
-    query = """ """
+    query = """show tables;"""
 
     with Database() as db:
         tables = db.execute(query)
@@ -25,7 +25,10 @@ def search_movie():
     # >>>> TODO 2: Search Motion Picture by Motion picture name. <<<<
     #              List the `name`, `rating`, `production` and `budget`.
 
-    query = """ """
+    query = """select mp.name, mp.rating, mp.production, mp.budget
+                from motionpicture mp
+                where mp.name like %s
+                ;"""
 
     with Database() as db:
         movies = db.execute(query, (f"%{movie_name}%",))
@@ -40,7 +43,9 @@ def search_liked_movies():
     # >>>> TODO 3: Find the movies that have been liked by a specific user’s email. <<<<
     #              List the movie `name`, `rating`, `production` and `budget`.
 
-    query = """ """
+    query = """select mp.name, mp.rating, mp.production, mp.budget
+                from motionpicture mp, user u, likes l, movie m
+                where mp.id = m.mpid and u.email = l.uemail and l.mpid = mp.id and u.email like %s;"""
 
     with Database() as db:
         movies = db.execute(query, (user_email,))
@@ -55,7 +60,9 @@ def search_by_country():
     # >>>> TODO 4: Search motion pictures by their shooting location country. <<<<
     #              List only the motion picture names without any duplicates.
 
-    query = """ """
+    query = """select distinct mp.name
+                from motionpicture mp, location l
+                where mp.id = l.mpid and l.country like %s;"""
 
     with Database() as db:
         movies = db.execute(query, (country,))
@@ -70,7 +77,13 @@ def search_directors_by_zip():
     # >>>> TODO 5: List all directors who have directed TV series shot in a specific zip code. <<<<
     #              List the director name and TV series name only without duplicates.
 
-    query = """ """
+    query = """SELECT DISTINCT p.name, mp.name
+                FROM people p, motionpicture mp, series s, location l, role r
+                WHERE r.role_name = "Director"
+                and r.pid = p.id
+                and mp.id = s.mpid
+                and l.mpid = mp.id
+                and l.zip = %s;"""
 
     with Database() as db:
         results = db.execute(query, (zip_code,))
